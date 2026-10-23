@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
+  <!-- Immediate Anti-Flicker Security Verification Gate -->
+  <script>
+    (function() {
+      try {
+        var token = sessionStorage.getItem('hl_auth_token') || localStorage.getItem('hl_auth_token');
+        if (token !== '11111111') {
+          document.documentElement.classList.add('auth-locked');
+        }
+      } catch(e) {
+        document.documentElement.classList.add('auth-locked');
+      }
+    })();
+  </script>
+
   <!-- Anti-Scraping & Privacy Protection -->
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <meta name="googlebot" content="noindex, nofollow, noarchive">
@@ -12,6 +26,43 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Security Gate Authentication Overlay -->
+    <div id="security-gate-overlay" class="security-gate-overlay">
+        <div class="security-gate-card">
+            <div class="security-gate-badge">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>RESTRICTED ACCESS ‧ 受限存取保護</span>
+            </div>
+            <div class="security-gate-icon">
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <rect x="9" y="9" width="6" height="5" rx="1"></rect>
+                    <path d="M10 9V7.5a2 2 0 1 1 4 0V9"></path>
+                </svg>
+            </div>
+            <h2 class="security-gate-title">HOWARD LIAO <span>Ph.D.</span></h2>
+            <div class="security-gate-sub">廖倫豪 博士 ｜ 跨國企業高管 暨 CISO 戰略檔案</div>
+            <p class="security-gate-desc">
+                本站包含跨國技術治理戰略、企業架構設計與高管機密檔案。請輸入授權存取密碼以繼續瀏覽。
+            </p>
+            <form id="security-gate-form" class="security-gate-form" onsubmit="handleSecurityAuth(event)">
+                <div class="security-input-wrapper">
+                    <input type="password" id="security-pass-input" class="security-pass-input" placeholder="請輸入存取密碼..." autocomplete="current-password" autofocus required>
+                    <button type="button" class="security-toggle-eye" onclick="togglePassVisibility()" aria-label="切換密碼顯示">
+                        <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+                <div id="security-error-msg" class="security-error-msg" data-error="密碼錯誤，請重新輸入 (Invalid Password)"></div>
+                <button type="submit" class="security-submit-btn">
+                    <span>驗證進入 ➔</span>
+                </button>
+            </form>
+            <div class="security-gate-footer">
+                <span>Authorized Access Only ‧ 授權請洽 liao.howard@gmail.com</span>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Sticky Navigation -->
     <nav class="navbar" id="navbar">
@@ -52,6 +103,7 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 下載履歷 <span class="en-nav">CV</span>
             </a>
+            <button type="button" onclick="lockSecurityGate(event)" class="btn-lock-nav" title="鎖定頁面 (Lock Site)">🔒 鎖定</button>
             <a href="#contact" class="btn-contact-nav">聯絡合作 <span class="en-nav">Contact</span></a>
             <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Menu">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>

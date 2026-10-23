@@ -332,3 +332,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3400);
     }
 });
+
+
+// ==========================================================================
+// Security Gate Controller (Access Key: 11111111)
+// ==========================================================================
+const HL_AUTH_STORAGE_KEY = 'hl_auth_token';
+const HL_VALID_PASSWORD = '11111111';
+
+window.isSecurityAuthenticated = function() {
+    try {
+        const token = sessionStorage.getItem(HL_AUTH_STORAGE_KEY) || localStorage.getItem(HL_AUTH_STORAGE_KEY);
+        return token === HL_VALID_PASSWORD;
+    } catch (e) {
+        return false;
+    }
+};
+
+window.handleSecurityAuth = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    const input = document.getElementById('security-pass-input');
+    const errorMsg = document.getElementById('security-error-msg');
+    const card = document.querySelector('.security-gate-card');
+    const overlay = document.getElementById('security-gate-overlay');
+    if (!input) return;
+
+    const val = input.value.trim();
+    if (val === HL_VALID_PASSWORD) {
+        try {
+            sessionStorage.setItem(HL_AUTH_STORAGE_KEY, HL_VALID_PASSWORD);
+            localStorage.setItem(HL_AUTH_STORAGE_KEY, HL_VALID_PASSWORD);
+        } catch (err) {}
+        
+        if (errorMsg) errorMsg.style.display = 'none';
+        if (card) card.classList.add('unlock-success');
+        
+        setTimeout(() => {
+            if (overlay) {
+                overlay.classList.add('hidden');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    document.documentElement.classList.remove('auth-locked');
+                    document.body.classList.remove('auth-locked');
+                }, 350);
+            } else {
+                document.documentElement.classList.remove('auth-locked');
+                document.body.classList.remove('auth-locked');
+            }
+        }, 180);
+    } else {
+        if (errorMsg) {
+            const customErr = errorMsg.getAttribute('data-error');
+            errorMsg.textContent = customErr || '密碼錯誤，請重新輸入 (Invalid Password)';
+            errorMsg.style.display = 'block';
+        }
+        if (card) {
+            card.classList.add('shake-error');
+            setTimeout(() => card.classList.remove('shake-error'), 600);
+        }
+        input.value = '';
+        input.focus();
+    }
+};
+
+window.togglePassVisibility = function() {
+    const input = document.getElementById('security-pass-input');
+    const eyeIcon = document.getElementById('eye-icon');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (eyeIcon) {
+            eyeIcon.innerHTML = `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`;
+        }
+    } else {
+        input.type = 'password';
+        if (eyeIcon) {
+            eyeIcon.innerHTML = `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        }
+    }
+};
+
+window.lockSecurityGate = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    try {
+        sessionStorage.removeItem(HL_AUTH_STORAGE_KEY);
+        localStorage.removeItem(HL_AUTH_STORAGE_KEY);
+    } catch(e) {}
+    window.location.reload();
+};
+
+// Check on initial run
+(function() {
+    if (window.isSecurityAuthenticated()) {
+        document.documentElement.classList.remove('auth-locked');
+        if (document.body) document.body.classList.remove('auth-locked');
+        const overlay = document.getElementById('security-gate-overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+        }
+    } else {
+        document.documentElement.classList.add('auth-locked');
+        if (document.body) document.body.classList.add('auth-locked');
+        setTimeout(() => {
+            const input = document.getElementById('security-pass-input');
+            if (input) input.focus();
+        }, 100);
+    }
+})();
